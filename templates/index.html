@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastPOS System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+                        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1470&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            color: #ff4757;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 1.2rem;
+            color: #2ed573;
+        }
+        .cards-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            width: 100%;
+        }
+        .card {
+            background: rgba(30, 30, 30, 0.85);
+            border: 2px solid #2ed573;
+            border-radius: 12px;
+            padding: 25px 20px;
+            width: 250px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card.admin-card {
+            border-color: #ffa502; /* لون برتقالي ميز للوحة الإدارة */
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(46, 213, 115, 0.4);
+        }
+        .card.admin-card:hover {
+            box-shadow: 0 8px 25px rgba(255, 165, 2, 0.4);
+        }
+        .icon {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+        }
+        .card h3 {
+            font-size: 1.4rem;
+            color: #ffa502;
+            margin-bottom: 12px;
+        }
+        .card.admin-card h3 {
+            color: #ff7f50;
+        }
+        .card p {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>FastPOS System</h1>
+        <p>اختر القسم المطلوب للبدء بالعمل</p>
+    </div>
+
+    <div class="cards-container">
+        <!-- واجهة الصندوق -->
+        <a href="/caisse" class="card">
+            <div class="icon">💵</div>
+            <h3>واجهة الصندوق<br>(Caisse)</h3>
+            <p>حساب الطاولات، الفواتير، وطباعة الوصل للزبون</p>
+        </a>
+
+        <!-- شاشة المطبخ -->
+        <a href="/kitchen" class="card">
+            <div class="icon">🍳</div>
+            <h3>شاشة المطبخ<br>(Kitchen)</h3>
+            <p>متابعة الطلبات الجديدة وتنبيهات الطهاة الحية</p>
+        </a>
+
+        <!-- لوحة إدارة السيرفر -->
+        <a href="/server" class="card">
+            <div class="icon">🖥️</div>
+            <h3>لوحة إدارة السيرفر</h3>
+            <p>إرسال وتسجيل الطلبات الخاصة بالطاولات</p>
+        </a>
+
+        <!-- البطاقة الجديدة: إدارة المنيو والأسعار -->
+        <a href="/admin/menu" class="card admin-card">
+            <div class="icon">⚙️</div>
+            <h3>إدارة المنيو والأسعار</h3>
+            <p>تعديل أسعار الأكلات، تغيير الأسماء، وإضافة أطباق جديدة</p>
+        </a>
+    </div>
+
+</body>
+</html>
