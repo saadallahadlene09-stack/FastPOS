@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant - قائمة الطلبات</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #ff4757;
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #ffa502;
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        .section {
+            background: rgba(30, 30, 30, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 2px solid #ff4757;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+        select, input {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+        }
+        .menu-item {
+            background: rgba(45, 45, 45, 0.95);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-right: 4px solid #ffa502;
+        }
+        button {
+            background: #ff4757;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #ff6b81;
+            transform: scale(1.05);
+        }
+        .cart-box {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px dashed #ffa502;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        .hidden { display: none; }
+        .category-header {
+            color: #38bdf8;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #444;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>FastPOS Restaurant</h1>
+    <div class="subtitle">نظام إرسال الطلبات الذكي</div>
+
+    <!-- خطوة 1: اختيار رقم الطاولة -->
+    <div id="table-section" class="section" style="text-align: center;">
+        <h3>اختر رقم الطاولة</h3>
+        <select id="table-select" style="width: 80%; margin: 15px 0;">
+            <option value="" disabled selected>-- اضغط لاختيار الطاولة --</option>
+            <option value="1">الطاولة رقم 01</option>
+            <option value="2">الطاولة رقم 02</option>
+            <option value="3">الطاولة رقم 03</option>
+            <option value="4">الطاولة رقم 04</option>
+            <option value="5">الطاولة رقم 05</option>
+            <option value="6">الطاولة رقم 06</option>
+            <option value="7">الطاولة رقم 07</option>
+            <option value="8">الطاولة رقم 08</option>
+            <option value="9">الطاولة رقم 09</option>
+            <option value="10">الطاولة رقم 10</option>
+            <option value="سفري">طلب سفري (Emporté)</option>
+        </select>
+        <br>
+        <button onclick="startOrder()" style="padding: 10px 25px;">عرض قائمة المأكولات 📋</button>
+    </div>
+
+    <!-- خطوة 2: قائمة الطعام (ديناميكية تلقائية من السيرفر) -->
+    <div id="menu-section" class="section hidden">
+        <h3 id="current-table-display" style="color: #38bdf8; text-align: center; margin-bottom: 20px;"></h3>
+        
+        <div class="category-header">🍔 قائمة المأكولات والوجبات</div>
+
+        <!-- توليد الأكلات تلقائياً من بايثون -->
+        {% for item in menu %}
+        <div class="menu-item">
+            <div style="text-align: right;">
+                <strong>{{ item.name }}</strong><br><span style="color: #ffa502;">{{ item.price }} دج</span>
+            </div>
+            <div>
+                <input type="number" id="qty-item-{{ item.id }}" value="1" min="1" style="width: 50px;">
+                <button onclick="addToCart('{{ item.name }}', {{ item.price }}, 'qty-item-{{ item.id }}')">إضافة للسلة 🛒</button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- صندوق السلة -->
+        <div class="cart-box">
+            <h3 style="color: #ffa502; margin-top: 0; text-align: center;">🛒 سلة الطلبات الخاصة بك</h3>
+            <div id="cart-items-list" style="color: #ccc; text-align: center; margin-bottom: 10px;">السلة فارغة حالياً</div>
+            <div style="text-align: center; font-weight: bold; font-size: 1.1em; margin-bottom: 15px;">
+                المجموع الإجمالي: <span id="cart-total" style="color: #2ed573;">0 دج</span>
+            </div>
+            <button onclick="sendFinalOrder()" style="background: #2ed573; width: 100%; padding: 12px; font-size: 1.1em;">إرسال الكل للكوزينة 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let selectedTable = '';
+        let cart = [];
+
+        function startOrder() {
+            const tableSelect = document.getElementById('table-select').value;
+            if (!tableSelect) {
+                alert('من فضلك اختر رقم الطاولة من القائمة أولاً!');
+                return;
+            }
+            selectedTable = tableSelect;
+            document.getElementById('current-table-display').innerText = 'أنت تطلب الآن في: الطاولة رقم ' + selectedTable;
+            
+            document.getElementById('table-section').classList.add('hidden');
+            document.getElementById('menu-section').classList.remove('hidden');
+        }
+
+        function addToCart(itemName, price, qtyId) {
+            const quantity = parseInt(document.getElementById(qtyId).value);
+            const itemTotal = price * quantity;
+
+            let existing = cart.find(i => i.name === itemName);
+            if (existing) {
+                existing.quantity += quantity;
+                existing.total += itemTotal;
+            } else {
+                cart.push({ name: itemName, price: price, quantity: quantity, total: itemTotal });
+            }
+
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const listDiv = document.getElementById('cart-items-list');
+            const totalSpan = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                listDiv.innerHTML = 'السلة فارغة حالياً';
+                totalSpan.innerText = '0 دج';
+                return;
+            }
+
+            let html = '';
+            let grandTotal = 0;
+
+            cart.forEach(item => {
+                grandTotal += item.total;
+                html += `<div class="cart-item">
+                    <span>${item.name} (×${item.quantity})</span>
+                    <span style="color: #ffa502;">${item.total} دج</span>
+                </div>`;
+            });
+
+            listDiv.innerHTML = html;
+            totalSpan.innerText = grandTotal + ' دج';
+        }
+
+        function sendFinalOrder() {
+            if (cart.length === 0) {
+                alert('السلة فارغة! اختر بعض المأكولات أولاً.');
+                return;
+            }
+
+            let grandTotal = cart.reduce((sum, item) => sum + item.total, 0);
+
+            const orderData = {
+                table: selectedTable,
+                items: cart, 
+                total: grandTotal,
+                time: new Date().toLocaleTimeString()
+            };
+
+            socket.emit('new_order', orderData);
+            alert('تم إرسال طلباتك بنجاح إلى المطبخ! ✅');
+            
+            cart = [];
+            updateCartUI();
+        }
+    </script>
+</body>
+</html>
