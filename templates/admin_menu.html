@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة القائمة والأسعار - FastPOS</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #f4f6f9; padding: 20px; direction: rtl; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h2 { color: #333; margin-bottom: 15px; }
+        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 5px 0; font-size: 16px; border-radius: 5px; border: 1px solid #ddd; }
+        input[type="text"], input[type="number"] { width: calc(100% - 130px); display: inline-block; }
+        button { background: #28a745; color: white; border: none; cursor: pointer; }
+        button.update { background: #007bff; padding: 5px 15px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #007bff; color: white; }
+        .back-btn { display: inline-block; margin-bottom: 15px; background: #6c757d; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
+        .back-btn:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- زر العودة للرئيسية -->
+        <a href="/" class="back-btn">⬅️ العودة للرئيسية</a>
+
+        <h2>لوحة تحكم السريع - تعديل الأسعار والأكلات</h2>
+
+        <!-- إضافة أكلة جديدة -->
+        <div class="card">
+            <h3>إضافة طبق جديد</h3>
+            <form method="POST">
+                <input type="hidden" name="action" value="add">
+                <input type="text" name="name" placeholder="اسم الأكلة (مثلاً: بيتزا تونة)" required>
+                <input type="number" name="price" placeholder="السعر (دج)" required>
+                <button type="submit">إضافة للقائمة</button>
+            </form>
+        </div>
+
+        <!-- قائمة الأطباق الحالية والتعديل عليها -->
+        <div class="card">
+            <h3>الأكلات والأسعار الحالية</h3>
+            <table>
+                <tr>
+                    <th>اسم الأكلة</th>
+                    <th>السعر الحالي</th>
+                    <th>تعديل السعر</th>
+                </tr>
+                {% for item in menu %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.price }} دج</td>
+                    <td>
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="number" name="price" value="{{ item.price }}" style="width: 80px;" required>
+                            <button type="submit" class="update">حفظ</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
