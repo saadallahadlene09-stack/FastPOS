@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Restaurant - واجهة الدفع (Caisse)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                        url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #ff4757;
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #2ed573;
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        .section {
+            background: rgba(30, 30, 30, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 2px solid #2ed573;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+        }
+        select, button {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #222;
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+        }
+        button {
+            background: #2ed573;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #26af5f;
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .bill-box {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px dashed #2ed573;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #444;
+            font-size: 1.1em;
+        }
+        .grand-total {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #ffa502;
+            text-align: left;
+            font-size: 1.3em;
+            color: #2ed573;
+            font-weight: bold;
+        }
+        .hidden { display: none; }
+
+        /* تنسيق خاص بطباعة الفاتورة الحرارية */
+        #printable-receipt {
+            display: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-receipt, #printable-receipt * {
+                visibility: visible;
+            }
+            #printable-receipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80mm;
+                background: white;
+                color: black;
+                padding: 10px;
+                font-family: 'Courier New', Courier, monospace;
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Restaurant Sedouki</h1>
+    <div class="subtitle">💵 نقطة البيع والخزينة (Caisse)</div>
+
+    <div class="section" style="text-align: center;">
+        <h3>اختر رقم الطاولة لمعرفة الحساب</h3>
+        <select id="caisse-table-select" style="width: 70%; margin: 15px 0;">
+            <option value="" disabled selected>-- اختر رقم الطاولة --</option>
+            <option value="1">الطاولة رقم 01</option>
+            <option value="2">الطاولة رقم 02</option>
+            <option value="3">الطاولة رقم 03</option>
+            <option value="4">الطاولة رقم 04</option>
+            <option value="5">الطاولة رقم 05</option>
+            <option value="6">الطاولة رقم 06</option>
+            <option value="7">الطاولة رقم 07</option>
+            <option value="8">الطاولة رقم 08</option>
+            <option value="9">الطاولة رقم 09</option>
+            <option value="10">الطاولة رقم 10</option>
+        </select>
+        <button onclick="checkTableBill()">بحث عن الحساب 🔍</button>
+
+        <!-- صندوق الفاتورة -->
+        <div id="bill-container" class="bill-box hidden">
+            <h3 style="color: #ffa502; margin-top: 0;">🧾 تفاصيل فاتورة الطاولة <span id="bill-table-num"></span></h3>
+            <div id="bill-items-list"></div>
+            <div class="grand-total">
+                المجموع الإجمالي للتسديد: <span id="bill-total" style="color: #2ed573;">0 دج</span>
+            </div>
+            
+            <!-- أزرار الإجراءات (دفع وطباعة) -->
+            <button onclick="printOrderReceipt()" style="background: #ffa502; color: #000; width: 100%; margin-top: 15px; font-size: 1.1em;">🖨️ طباعة الفاتورة للزبون</button>
+            <button onclick="payBill()" style="background: #ff4757; color: #fff; width: 100%; margin-top: 10px; font-size: 1.1em;">تأكيد الدفع وإغلاق الطاولة 💳</button>
+        </div>
+    </div>
+
+    <!-- قالب الفاتورة المخفي المخصص للطباعة الحرارية -->
+    <div id="printable-receipt">
+        <div style="text-align: center;">
+            <h2 style="margin: 0;">Restaurant Sedouki</h2>
+            <p style="margin: 5px 0;">فاتورة زبون - طاولة رقم: <span id="receipt-print-table"></span></p>
+            <p id="receipt-date" style="font-size: 0.85em; color: #555; margin: 0;"></p>
+            <hr style="border: 1px dashed #000; margin: 10px 0;">
+        </div>
+        <div id="receipt-print-items" style="margin: 10px 0;"></div>
+        <hr style="border: 1px dashed #000; margin: 10px 0;">
+        <div style="font-size: 1.1em; font-weight: bold; display: flex; justify-content: space-between;">
+            <span>المجموع:</span>
+            <span id="receipt-print-total">0 دج</span>
+        </div>
+        <div style="text-align: center; margin-top: 15px; font-size: 0.85em;">
+            <p style="margin: 2px 0;">شكراً لزيارتكم Restaurant Sedouki!</p>
+            <p style="margin: 2px 0;">بالصحة والهناء 🍕</p>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let currentOrderData = null; // لتخزين بيانات الطلب الحالي وطباعته
+
+        function checkTableBill() {
+            const tableNum = document.getElementById('caisse-table-select').value;
+            if (!tableNum) {
+                alert('من فضلك اختر رقم الطاولة أولاً!');
+                return;
+            }
+            socket.emit('get_table_order', { table: tableNum });
+        }
+
+        socket.on('table_order_response', function(order) {
+            const billContainer = document.getElementById('bill-container');
+            const itemsList = document.getElementById('bill-items-list');
+            const tableNumSpan = document.getElementById('bill-table-num');
+            const totalSpan = document.getElementById('bill-total');
+
+            if (!order) {
+                alert('لا توجد طلبات مسجلة لهذه الطاولة حالياً!');
+                billContainer.classList.add('hidden');
+                currentOrderData = null;
+                return;
+            }
+
+            currentOrderData = order; // نحفظ الطلب باش نستعملوه في الطباعة
+            tableNumSpan.innerText = order.table;
+            let html = '';
+            order.items.forEach(i => {
+                html += `
+                    <div class="item-row">
+                        <span>${i.name} (<strong>×${i.quantity}</strong>)</span>
+                        <span style="color: #ffa502;">${i.total} دج</span>
+                    </div>
+                `;
+            });
+
+            itemsList.innerHTML = html;
+            totalSpan.innerText = order.total + ' دج';
+            billContainer.classList.remove('hidden');
+        });
+
+        function printOrderReceipt() {
+            if (!currentOrderData) {
+                alert('لا يوجد طلب نشط لطباعته!');
+                return;
+            }
+
+            // تعبئة معلومات الفاتورة المخصصة للطباعة الحرارية
+            document.getElementById('receipt-print-table').innerText = currentOrderData.table;
+            document.getElementById('receipt-print-total').innerText = currentOrderData.total + ' دج';
+            
+            const now = new Date();
+            document.getElementById('receipt-date').innerText = 'التاريخ: ' + now.toLocaleDateString() + ' - ' + now.toLocaleTimeString();
+
+            let printItemsHtml = '';
+            currentOrderData.items.forEach(i => {
+                printItemsHtml += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9em;">
+                        <span>${i.name} (x${i.quantity})</span>
+                        <span>${i.total} دج</span>
+                    </div>
+                `;
+            });
+            document.getElementById('receipt-print-items').innerHTML = printItemsHtml;
+
+            // فتح نافذة طباعة المتصفح
+            window.print();
+        }
+
+        function payBill() {
+            alert('تم تسديد الفاتورة بنجاح! ✅');
+            document.getElementById('bill-container').classList.add('hidden');
+            document.getElementById('caisse-table-select').value = '';
+            currentOrderData = null;
+        }
+    </script>
+</body>
+</html>
