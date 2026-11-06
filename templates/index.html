@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastPOS System</title>
+    <title>FastPOS Restaurant</title>
     <style>
         * {
             box-sizing: border-box;
@@ -15,7 +15,7 @@
             background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
                         url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1470&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -61,7 +61,7 @@
             align-items: center;
         }
         .card.admin-card {
-            border-color: #ffa502; /* لون برتقالي ميز للوحة الإدارة */
+            border-color: #ffa502;
         }
         .card:hover {
             transform: translateY(-8px);
@@ -92,34 +92,34 @@
 <body>
 
     <div class="header">
-        <h1>FastPOS System</h1>
+        <h1>FastPOS Restaurant</h1>
         <p>اختر القسم المطلوب للبدء بالعمل</p>
     </div>
 
     <div class="cards-container">
         <!-- واجهة الصندوق -->
-        <a href="/caisse" class="card">
+        <a href="/caisse" target="_self" class="card">
             <div class="icon">💵</div>
             <h3>واجهة الصندوق<br>(Caisse)</h3>
             <p>حساب الطاولات، الفواتير، وطباعة الوصل للزبون</p>
         </a>
 
         <!-- شاشة المطبخ -->
-        <a href="/kitchen" class="card">
+        <a href="/kitchen" target="_self" class="card">
             <div class="icon">🍳</div>
             <h3>شاشة المطبخ<br>(Kitchen)</h3>
             <p>متابعة الطلبات الجديدة وتنبيهات الطهاة الحية</p>
         </a>
 
         <!-- لوحة إدارة السيرفر -->
-        <a href="/server" class="card">
+        <a href="/server" target="_self" class="card">
             <div class="icon">🖥️</div>
             <h3>لوحة إدارة السيرفر</h3>
             <p>إرسال وتسجيل الطلبات الخاصة بالطاولات</p>
         </a>
 
-        <!-- البطاقة الجديدة: إدارة المنيو والأسعار -->
-        <a href="/admin/menu" class="card admin-card">
+        <!-- إدارة المنيو والأسعار -->
+        <a href="/admin/menu" target="_self" class="card admin-card">
             <div class="icon">⚙️</div>
             <h3>إدارة المنيو والأسعار</h3>
             <p>تعديل أسعار الأكلات، تغيير الأسماء، وإضافة أطباق جديدة</p>
