@@ -155,7 +155,10 @@
     </div>
 
     <script>
-        const socket = io();
+        const socket = io({
+            transports: ['websocket', 'polling']
+        });
+        
         let selectedTable = '';
         let cart = [];
 
@@ -233,6 +236,21 @@
             cart = [];
             updateCartUI();
         }
+
+        // تفادي الشاشة البيضاء في تطبيقات الـ WebView للهاتف وإعادة الاتصال تلقائياً
+        socket.on('connect_error', function() {
+            setTimeout(() => {
+                socket.connect();
+            }, 3000);
+        });
+
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (document.body.innerHTML.trim() === '') {
+                    location.reload();
+                }
+            }, 5000);
+        });
     </script>
 </body>
 </html>
