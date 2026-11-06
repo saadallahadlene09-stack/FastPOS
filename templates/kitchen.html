@@ -143,9 +143,18 @@
     </div>
 
     <script>
-        // إعداد الاتصال مع خادم Render مع تحديد طرق النقل (Transports) لضمان عدم انقطاع الاتصال
+        // إعداد الاتصال مع الخادم مع تحديد طرق النقل
         const socket = io({
             transports: ['websocket', 'polling']
+        });
+
+        // مراقبة حالة الاتصال للتأكد من أن الكوزينة متصلة بالسيرفر
+        socket.on('connect', function() {
+            console.log("🟢 متصل بسيرفر المطبخ بنجاح! معرف الاتصال:", socket.id);
+        });
+
+        socket.on('connect_error', function(err) {
+            console.log("🔴 خطأ في اتصال المطبخ بالسيرفر:", err);
         });
 
         const ordersDiv = document.getElementById('orders');
@@ -207,8 +216,9 @@
             }
         }
 
-        // الاستماع للطلبات الجديدة الواردة من السيرفر (عبر أي جهاز متصل مثل الهاتف)
+        // الاستماع للطلبات الجديدة الواردة من السيرفر
         socket.on('new_order', function(data) {
+            console.log("📦 وصلت طلبية جديدة:", data);
             playBeep(); // تشغيل صوت التنبيه فور وصول الطلبية
 
             if (ordersDiv.querySelector('p')) {
@@ -233,7 +243,7 @@
                     <span class="table-badge">طاولة رقم: ${data.table}</span>
                     <span class="time-text">🕒 ${data.time}</span>
                 </div>
-                <div style="margin: 10px 0;">
+                <div style="margin: 100px 0;">
                     ${itemsHtml}
                 </div>
                 <div class="grand-total">
