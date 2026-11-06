@@ -143,15 +143,15 @@
     </div>
 
     <script>
-        // إعداد الاتصال ليتوافق تماماً مع قيود سيرفرات Render (البدء بـ polling ثم الترقية)
+        // إعداد الاتصال السريع جداً لتفتح الصفحة فوراً بدون أي تأخير
         const socket = io({
             transports: ['polling', 'websocket'],
-            upgrade: true,
-            rememberUpgrade: true,
-            timeout: 20000
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            timeout: 10000
         });
 
-        // مراقبة حالة الاتصال
+        // مراقبة حالة الاتصال في الخلفية
         socket.on('connect', function() {
             console.log("🟢 متصل بسيرفر المطبخ بنجاح! معرف الاتصال:", socket.id);
         });
