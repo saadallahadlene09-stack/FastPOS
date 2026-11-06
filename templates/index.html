@@ -129,9 +129,7 @@
 
     <script>
         function goTo(path) {
-            // استخدام رابط كامل مع إضافة طابع زمني دقيق لإجبار التطبيق على جلب الصفحة وعدم تجميدها
-            const cleanHost = window.location.origin;
-            window.location.href = cleanHost + path + '?v=' + Date.now();
+            window.open(window.location.origin + path, '_self');
         }
     </script>
 
