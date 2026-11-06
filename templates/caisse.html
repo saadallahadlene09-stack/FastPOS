@@ -170,7 +170,14 @@
     </div>
 
     <script>
-        const socket = io();
+        // ضبط الاتصال ليتوافق كلياً مع استضافة Render
+        const socket = io({
+            transports: ['polling', 'websocket'],
+            upgrade: true,
+            rememberUpgrade: true,
+            timeout: 20000
+        });
+
         let currentOrderData = null;
 
         function checkTableBill() {
@@ -210,6 +217,11 @@
             itemsList.innerHTML = html;
             totalSpan.innerText = order.total + ' دج';
             billContainer.classList.remove('hidden');
+        });
+
+        // استقبال التنبيهات الحية عند إرسال أي طلبية جديدة من السيرفر
+        socket.on('new_order', function(data) {
+            console.log("وصلت طلبية جديدة للصندوق:", data);
         });
 
         function printOrderReceipt() {
