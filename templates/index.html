@@ -99,28 +99,28 @@
 
     <div class="cards-container">
         <!-- واجهة الصندوق -->
-        <div class="card" onclick="openPage('/caisse')">
+        <div class="card" onclick="goTo('/caisse')">
             <div class="icon">💵</div>
             <h3>واجهة الصندوق<br>(Caisse)</h3>
             <p>حساب الطاولات، الفواتير، وطباعة الوصل للزبون</p>
         </div>
 
         <!-- شاشة المطبخ -->
-        <div class="card" onclick="openPage('/kitchen')">
+        <div class="card" onclick="goTo('/kitchen')">
             <div class="icon">🍳</div>
             <h3>شاشة المطبخ<br>(Kitchen)</h3>
             <p>متابعة الطلبات الجديدة وتنبيهات الطهاة الحية</p>
         </div>
 
         <!-- لوحة إدارة السيرفر -->
-        <div class="card" onclick="openPage('/server')">
+        <div class="card" onclick="goTo('/server')">
             <div class="icon">🖥️</div>
             <h3>لوحة إدارة السيرفر</h3>
             <p>إرسال وتسجيل الطلبات الخاصة بالطاولات</p>
         </div>
 
         <!-- إدارة المنيو والأسعار -->
-        <div class="card admin-card" onclick="openPage('/admin/menu')">
+        <div class="card admin-card" onclick="goTo('/admin/menu')">
             <div class="icon">⚙️</div>
             <h3>إدارة المنيو والأسعار</h3>
             <p>تعديل أسعار الأكلات، تغيير الأسماء، وإضافة أطباق جديدة</p>
@@ -128,9 +128,10 @@
     </div>
 
     <script>
-        function openPage(url) {
-            // فتح الصفحة مباشرة وتجنب تجميد الـ WebView
-            window.location.assign(url);
+        function goTo(path) {
+            // استخدام رابط كامل مع إضافة طابع زمني دقيق لإجبار التطبيق على جلب الصفحة وعدم تجميدها
+            const cleanHost = window.location.origin;
+            window.location.href = cleanHost + path + '?v=' + Date.now();
         }
     </script>
 
