@@ -129,8 +129,8 @@
 
     <script>
         function openPage(url) {
-            // إضافة وقت عشوائي للرابط لمنع تخزين الكاش وفتح الصفحة في كل مرة بجديد
-            window.location.href = url + '?t=' + new Date().getTime();
+            // فتح الصفحة مباشرة وتجنب تجميد الـ WebView
+            window.location.assign(url);
         }
     </script>
 
