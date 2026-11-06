@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Restaurant - شاشة المطبخ</title>
+    <!-- مكتبة Socket.io -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
         body {
@@ -142,7 +143,11 @@
     </div>
 
     <script>
-        const socket = io();
+        // إعداد الاتصال مع خادم Render مع تحديد طرق النقل (Transports) لضمان عدم انقطاع الاتصال
+        const socket = io({
+            transports: ['websocket', 'polling']
+        });
+
         const ordersDiv = document.getElementById('orders');
         let audioCtx = null;
 
@@ -154,7 +159,6 @@
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            // تجربة صوتية قصيرة لتمكين الصوت مباشرة
             playBeep();
             const btn = document.getElementById('enableAudioBtn');
             btn.innerText = '🔊 التنبيه الصوتي مفعّل بنجاح';
@@ -178,7 +182,7 @@
                 const osc1 = audioCtx.createOscillator();
                 const gain1 = audioCtx.createGain();
                 osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(880, now); // نغمة A5
+                osc1.frequency.setValueAtTime(880, now);
                 gain1.gain.setValueAtTime(0.2, now);
                 gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
                 osc1.connect(gain1);
@@ -190,7 +194,7 @@
                 const osc2 = audioCtx.createOscillator();
                 const gain2 = audioCtx.createGain();
                 osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(1046.5, now + 0.25); // نغمة C6
+                osc2.frequency.setValueAtTime(1046.5, now + 0.25);
                 gain2.gain.setValueAtTime(0.2, now + 0.25);
                 gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                 osc2.connect(gain2);
@@ -203,8 +207,9 @@
             }
         }
 
+        // الاستماع للطلبات الجديدة الواردة من السيرفر (عبر أي جهاز متصل مثل الهاتف)
         socket.on('new_order', function(data) {
-            playBeep(); // تشغيل صوت التنبيه فور وصول أي طلب جديد!
+            playBeep(); // تشغيل صوت التنبيه فور وصول الطلبية
 
             if (ordersDiv.querySelector('p')) {
                 ordersDiv.innerHTML = '';
