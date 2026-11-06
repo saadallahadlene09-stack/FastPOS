@@ -129,7 +129,8 @@
 
     <script>
         function goTo(path) {
-            window.open(window.location.origin + path, '_self');
+            // استبدال الصفحة الحالية في السجل لمنع تجميد الـ WebView عند الرجوع
+            window.location.replace(window.location.origin + path);
         }
     </script>
 
