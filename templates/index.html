@@ -59,6 +59,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            cursor: pointer;
         }
         .card.admin-card {
             border-color: #ffa502;
@@ -98,33 +99,40 @@
 
     <div class="cards-container">
         <!-- واجهة الصندوق -->
-        <a href="/caisse" target="_self" class="card">
+        <div class="card" onclick="openPage('/caisse')">
             <div class="icon">💵</div>
             <h3>واجهة الصندوق<br>(Caisse)</h3>
             <p>حساب الطاولات، الفواتير، وطباعة الوصل للزبون</p>
-        </a>
+        </div>
 
         <!-- شاشة المطبخ -->
-        <a href="/kitchen" target="_self" class="card">
+        <div class="card" onclick="openPage('/kitchen')">
             <div class="icon">🍳</div>
             <h3>شاشة المطبخ<br>(Kitchen)</h3>
             <p>متابعة الطلبات الجديدة وتنبيهات الطهاة الحية</p>
-        </a>
+        </div>
 
         <!-- لوحة إدارة السيرفر -->
-        <a href="/server" target="_self" class="card">
+        <div class="card" onclick="openPage('/server')">
             <div class="icon">🖥️</div>
             <h3>لوحة إدارة السيرفر</h3>
             <p>إرسال وتسجيل الطلبات الخاصة بالطاولات</p>
-        </a>
+        </div>
 
         <!-- إدارة المنيو والأسعار -->
-        <a href="/admin/menu" target="_self" class="card admin-card">
+        <div class="card admin-card" onclick="openPage('/admin/menu')">
             <div class="icon">⚙️</div>
             <h3>إدارة المنيو والأسعار</h3>
             <p>تعديل أسعار الأكلات، تغيير الأسماء، وإضافة أطباق جديدة</p>
-        </a>
+        </div>
     </div>
+
+    <script>
+        function openPage(url) {
+            // إضافة وقت عشوائي للرابط لمنع تخزين الكاش وفتح الصفحة في كل مرة بجديد
+            window.location.href = url + '?t=' + new Date().getTime();
+        }
+    </script>
 
 </body>
 </html>
