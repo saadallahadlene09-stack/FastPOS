@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Restaurant - واجهة الدفع (Caisse)</title>
+    <title>FastPOS Restaurant - واجهة الدفع (Caisse)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
         body {
@@ -115,7 +115,7 @@
 </head>
 <body>
 
-    <h1>Restaurant Sedouki</h1>
+    <h1>FastPOS Restaurant</h1>
     <div class="subtitle">💵 نقطة البيع والخزينة (Caisse)</div>
 
     <div class="section" style="text-align: center;">
@@ -152,7 +152,7 @@
     <!-- قالب الفاتورة المخفي المخصص للطباعة الحرارية -->
     <div id="printable-receipt">
         <div style="text-align: center;">
-            <h2 style="margin: 0;">Restaurant Sedouki</h2>
+            <h2 style="margin: 0;">FastPOS Restaurant</h2>
             <p style="margin: 5px 0;">فاتورة زبون - طاولة رقم: <span id="receipt-print-table"></span></p>
             <p id="receipt-date" style="font-size: 0.85em; color: #555; margin: 0;"></p>
             <hr style="border: 1px dashed #000; margin: 10px 0;">
@@ -164,14 +164,14 @@
             <span id="receipt-print-total">0 دج</span>
         </div>
         <div style="text-align: center; margin-top: 15px; font-size: 0.85em;">
-            <p style="margin: 2px 0;">شكراً لزيارتكم Restaurant Sedouki!</p>
+            <p style="margin: 2px 0;">شكراً لزيارتكم FastPOS Restaurant!</p>
             <p style="margin: 2px 0;">بالصحة والهناء 🍕</p>
         </div>
     </div>
 
     <script>
         const socket = io();
-        let currentOrderData = null; // لتخزين بيانات الطلب الحالي وطباعته
+        let currentOrderData = null;
 
         function checkTableBill() {
             const tableNum = document.getElementById('caisse-table-select').value;
@@ -195,7 +195,7 @@
                 return;
             }
 
-            currentOrderData = order; // نحفظ الطلب باش نستعملوه في الطباعة
+            currentOrderData = order;
             tableNumSpan.innerText = order.table;
             let html = '';
             order.items.forEach(i => {
@@ -218,7 +218,6 @@
                 return;
             }
 
-            // تعبئة معلومات الفاتورة المخصصة للطباعة الحرارية
             document.getElementById('receipt-print-table').innerText = currentOrderData.table;
             document.getElementById('receipt-print-total').innerText = currentOrderData.total + ' دج';
             
@@ -236,7 +235,6 @@
             });
             document.getElementById('receipt-print-items').innerHTML = printItemsHtml;
 
-            // فتح نافذة طباعة المتصفح
             window.print();
         }
 
